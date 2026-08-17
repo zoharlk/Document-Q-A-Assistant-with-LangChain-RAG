@@ -1,3 +1,4 @@
+import gc
 import json
 import os
 import shutil
@@ -5,13 +6,13 @@ from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
-from ingest import load_documents, DOCS_DIR
+from ingest import load_documents, DOCS_DIR, enrich_chunks
 
 load_dotenv()
 
 # Grid of parameters to try. Add/remove values to widen or narrow the search.
-CHUNK_SIZES = [400, 800, 1200]
-CHUNK_OVERLAPS = [0, 100, 200]
+CHUNK_SIZES = [ 500, 550, 600]
+CHUNK_OVERLAPS = [50, 100, 150]
 
 # Questions grounded in the worked examples of each NF-AI methodology
 # document, paired with keywords/phrases that should appear in a chunk that
@@ -103,7 +104,7 @@ TEST_QUERIES = [
 # chunks per query can only help hit_rate (more chances to catch the right
 # evidence), but it also means more tokens and more irrelevant text fed to
 # the generator. The goal is the smallest k that still gets the evidence in.
-TOP_K_VALUES = [2, 4, 6, 8]
+TOP_K_VALUES = [4, 5, 6, 7,8]
 
 TEMP_DB_DIR = "chroma_db_experiment"
 
@@ -119,6 +120,7 @@ def evaluate_combo(docs, chunk_size, chunk_overlap, embeddings):
         separators=["\n\n", "\n", ". ", " ", ""],
     )
     chunks = splitter.split_documents(docs)
+    chunks = enrich_chunks(chunks)
 
     lengths = [len(c.page_content) for c in chunks]
     stats = {
@@ -131,7 +133,7 @@ def evaluate_combo(docs, chunk_size, chunk_overlap, embeddings):
     }
 
     if os.path.exists(TEMP_DB_DIR):
-        shutil.rmtree(TEMP_DB_DIR)
+        shutil.rmtree(TEMP_DB_DIR, ignore_errors=True)
     db = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
@@ -155,7 +157,9 @@ def evaluate_combo(docs, chunk_size, chunk_overlap, embeddings):
                 hits += 1
         hit_rate_by_k[k] = round(hits / len(TEST_QUERIES), 2)
 
-    shutil.rmtree(TEMP_DB_DIR)
+    del db
+    gc.collect()
+    shutil.rmtree(TEMP_DB_DIR, ignore_errors=True)
 
     best_hit_rate = max(hit_rate_by_k.values())
     # Smallest k that reaches this combo's best achievable hit_rate: going

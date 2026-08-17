@@ -1,5 +1,11 @@
+# This script reads our documents, splits them into chunks, 
+# turns each chunk into an embedding, and stores
+# everything in a Chroma vector database saved to a folder called chroma_db .
+# we run it once (and again whenever our documents change).
+
 import json
 import os
+import shutil
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -51,6 +57,19 @@ CHUNK_SIZE, CHUNK_OVERLAP, TOP_K = load_best_params()
 # Chroma(...).as_retriever(search_kwargs={"k": TOP_K})
 
 
+def enrich_chunks(chunks):
+    # Prepend each chunk with its source document name before embedding.
+    # Short, generic-looking text (like one row of a "Roles and
+    # Responsibilities" table) is nearly identical across many documents,
+    # so dense search alone struggles to tell them apart; the document name
+    # gives every chunk distinguishing context that survives embedding.
+    for chunk in chunks:
+        filename = os.path.basename(chunk.metadata.get("source", "unknown"))
+        title = os.path.splitext(filename)[0].replace("_", " ")
+        chunk.page_content = f"Document: {title}\n\n{chunk.page_content}"
+    return chunks
+
+
 def load_documents(folder):
     docs = []
     # Read every supported file in the folder into memory
@@ -82,10 +101,18 @@ def main():
     )
 
     chunks = splitter.split_documents(docs)
+    chunks = enrich_chunks(chunks)
     print(f"Split into {len(chunks)} chunks.")
 
     # Turn each chunk into an embedding (a meaning-vector)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+    # Wipe any existing store first. Chroma.from_documents() ADDS to an
+    # existing store at persist_directory rather than replacing it, so
+    # without this, every re-run leaves old (possibly stale/duplicate)
+    # chunks sitting alongside the new ones, competing during retrieval.
+    if os.path.exists(DB_DIR):
+        shutil.rmtree(DB_DIR)
 
     # Store the chunks + embeddings in Chroma, saved to disk
     Chroma.from_documents(

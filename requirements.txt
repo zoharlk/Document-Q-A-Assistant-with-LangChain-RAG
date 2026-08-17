@@ -6,4 +6,5 @@ langchain-text-splitters
 chromadb
 pypdf
 python-dotenv
+streamlit
 
