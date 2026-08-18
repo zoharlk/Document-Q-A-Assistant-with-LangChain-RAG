@@ -1,5 +1,5 @@
 
-# Q&A Assistant — Chat With Your Documents
+# Q&A Assistant - Chat With Your Documents
 A Retrieval-Augmented Generation (RAG) app that answers questions
 about your own documents and cites its sources.
 
@@ -57,17 +57,17 @@ The screenshots below walk through a full session: the home screen,
 typing a question, clicking "Ask", and receiving the answer with its
 sources.
 
-![Q&A Assistant home screen before a question is asked](screenshots/app-answer-demo1.png)
 *1. Home screen*
+![Q&A Assistant home screen before a question is asked](screenshots/app-answer-demo1.PNG)
 
-![A question typed into the input box](screenshots/app-answer-demo2.png)
 *2. Typing a question*
+![A question typed into the input box](screenshots/app-answer-demo2.PNG)
 
-![The Ask button clicked, retrieving an answer](screenshots/app-answer-demo3.png)
 *3. Clicking "Ask"*
+![The Ask button clicked, retrieving an answer](screenshots/app-answer-demo3.PNG)
 
-![The final answer displayed with its cited source documents](screenshots/app-answer-demo4.png)
 *4. Answer with sources*
+![The final answer displayed with its cited source documents](screenshots/app-answer-demo4.PNG)
 
 ## What I'd improve next
 The Q&A Assistant project always runs the same straight-line pipeline:
