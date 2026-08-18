@@ -1,5 +1,5 @@
 
-# Q&A Assistant — Chat With Your Documents
+# Q&A Assistant - Chat With Your Documents
 A Retrieval-Augmented Generation (RAG) app that answers questions
 about your own documents and cites its sources.
 
