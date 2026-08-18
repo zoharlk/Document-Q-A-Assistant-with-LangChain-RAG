@@ -57,16 +57,16 @@ The screenshots below walk through a full session: the home screen,
 typing a question, clicking "Ask", and receiving the answer with its
 sources.
 
-*1. Home screen*
+*1. Home screen:*
 ![Q&A Assistant home screen before a question is asked](screenshots/app-answer-demo1.PNG)
 
-*2. Typing a question*
+*2. Typing a question:*
 ![A question typed into the input box](screenshots/app-answer-demo2.PNG)
 
-*3. Clicking "Ask"*
+*3. Clicking "Ask":*
 ![The Ask button clicked, retrieving an answer](screenshots/app-answer-demo3.PNG)
 
-*4. Answer with sources*
+*4. Answer with sources:*
 ![The final answer displayed with its cited source documents](screenshots/app-answer-demo4.PNG)
 
 ## What I'd improve next
